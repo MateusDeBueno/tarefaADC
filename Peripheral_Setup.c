@@ -61,11 +61,11 @@ void Setup_GPIO(void){
     GpioCtrlRegs.GPEMUX2.bit.GPIO159 = 1;     //configura como PWM, escolhe a funcao
     GpioCtrlRegs.GPEPUD.bit.GPIO159 = 1;      //desabilita pull up
 
+    //GPIO14
     GpioCtrlRegs.GPAGMUX1.bit.GPIO14 = 0;
     GpioCtrlRegs.GPAMUX1.bit.GPIO14 = 0;
     GpioCtrlRegs.GPADIR.bit.GPIO14 = 1;
     GpioCtrlRegs.GPAPUD.bit.GPIO14 = 1;
-
 
     EDIS;
 }
@@ -78,7 +78,7 @@ void Setup_ePWM(void){
     /////////////CONFIGURA PWM1/////////////
 
     //configura portadora
-    EPwm1Regs.TBPRD = 2000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
+    EPwm1Regs.TBPRD = 5000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
     EPwm1Regs.TBPHS.bit.TBPHS = 0;                      //defasagem 0
     EPwm1Regs.TBCTL.bit.SYNCOSEL = TB_CTR_ZERO;         //quando igual a zero gera pulso de referencia pra outros PWM
     EPwm1Regs.TBCTR = 0x0000;
@@ -114,7 +114,7 @@ void Setup_ePWM(void){
 
 
     /////////////CONFIGURA PWM7/////////////
-    EPwm7Regs.TBPRD = 2000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
+    EPwm7Regs.TBPRD = 5000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
     EPwm7Regs.CMPA.bit.CMPA = 0;
     EPwm7Regs.TBPHS.bit.TBPHS = 0;                      //defasagem 0
     EPwm7Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;          //recebe pulso de sincronismo
@@ -137,7 +137,7 @@ void Setup_ePWM(void){
 
 
     /////////////CONFIGURA PWM8/////////////
-    EPwm8Regs.TBPRD = 2000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
+    EPwm8Regs.TBPRD = 5000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
     EPwm8Regs.CMPA.bit.CMPA = 0;
     EPwm8Regs.TBPHS.bit.TBPHS = 0;                      //defasagem 0
     EPwm8Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;          //recebe pulso de sincronismo

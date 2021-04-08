@@ -5,8 +5,9 @@
  */
 
 
-uint32_t count=0, index=0;
+uint32_t count=0, index=0, index400=0;
 uint16_t sinetable[125];
+uint16_t sinetable400[400];
 
 uint16_t adc1 = 0;
 uint16_t adc2 = 0;
@@ -48,6 +49,10 @@ int main(void)
     for (index = 0; index < 125; index++){
         sinetable[index] = (uint16_t) (1000.0*(1.0 + sin(6.28318531/125.0*((float)index))));
     }
+
+    for (index = 0; index < 400; index++){
+        sinetable400[index] = 500 + (uint16_t) (2000.0*(1.0 + sin(6.28318531/400.0*((float)index))));
+    }
     index = 0;
 
     EINT;                           //Enable Global interrupt INTM
@@ -61,12 +66,12 @@ int main(void)
 __interrupt void isr_cpu_timer0(void){
     GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
 
-
+    /*
     index = (index == 124) ? 0 : (index+1);
 
     EPwm7Regs.CMPA.bit.CMPA = sinetable[index];
     EPwm8Regs.CMPA.bit.CMPA = sinetable[index];
-
+    */
 
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1; //flag q sinaliza fim da interrupt, n apagar
 }
@@ -78,9 +83,12 @@ __interrupt void isr_adc(void){
     adc1 = AdcaResultRegs.ADCRESULT0;
     adc2 = AdcaResultRegs.ADCRESULT1;
 
+    index400 = (index400 == 400) ? 0 : (index400+1);
 
+    EPwm7Regs.CMPA.bit.CMPA = sinetable[index400];
+    EPwm8Regs.CMPA.bit.CMPA = sinetable[index400];
 
-    //plot[index] = *adc;
+    plot[index400] = *adc;
 
     deleta++;
     AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;  //clear INT1 flag

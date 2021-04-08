@@ -78,7 +78,7 @@ void Setup_ePWM(void){
     /////////////CONFIGURA PWM1/////////////
 
     //configura portadora
-    EPwm1Regs.TBPRD = 5000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
+    EPwm1Regs.TBPRD = 3255;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
     EPwm1Regs.TBPHS.bit.TBPHS = 0;                      //defasagem 0
     EPwm1Regs.TBCTL.bit.SYNCOSEL = TB_CTR_ZERO;         //quando igual a zero gera pulso de referencia pra outros PWM
     EPwm1Regs.TBCTR = 0x0000;
@@ -114,7 +114,7 @@ void Setup_ePWM(void){
 
 
     /////////////CONFIGURA PWM7/////////////
-    EPwm7Regs.TBPRD = 5000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
+    EPwm7Regs.TBPRD = 3250;                             //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
     EPwm7Regs.CMPA.bit.CMPA = 0;
     EPwm7Regs.TBPHS.bit.TBPHS = 0;                      //defasagem 0
     EPwm7Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;          //recebe pulso de sincronismo
@@ -194,4 +194,21 @@ void Setup_ADC(void){
 
     EDIS;
 
+}
+
+
+
+
+void Setup_DAC(void){
+    EALLOW;
+    CpuSysRegs.PCLKCR16.bit.DAC_A = 1;
+    DacaRegs.DACCTL.bit.SYNCSEL = 0x00; //0 EPWM1SYNCPER //DAC EPWMSYNCPER select
+    DacaRegs.DACCTL.bit.LOADMODE = 0x01; //Determines when the DACVALA register is updated with the value from DACVALS
+    //1 Load on next EPWMSYNCPER specified by SYNCSEL
+    DacaRegs.DACCTL.bit.DACREFSEL = 0x01; //DAC reference select. Selects which voltage references are used by the DAC. (3v ou 3.3v)
+    DacaRegs.DACVALS.bit.DACVALS = 0;   //12bits
+    DacaRegs.DACOUTEN.bit.DACOUTEN =    1;
+    DacaRegs.DACLOCK.all = 0x00;
+
+    EDIS;
 }

@@ -14,9 +14,14 @@
 void Setup_GPIO(void);
 void Setup_ePWM(void);
 void Setup_ADC(void);
+void Setup_DAC(void);
 
-
-//criar define manual para selecionar ADC
+//criar define manual para selecionar trigger do ADC
+#define TRIG_SEL_SOFT   0x00
+#define TRIG_SEL_TIM0   0x01
+#define TRIG_SEL_TIM1   0x02
+#define TRIG_SEL_TIM2   0x03
+#define TRIG_SEL_GPIO   0x04
 #define TRIG_SEL_ePWM1_SOCA 0x05
 #define TRIG_SEL_ePWM1_SOCB 0x06
 #define TRIG_SEL_ePWM2_SOCA 0x07
@@ -41,5 +46,8 @@ void Setup_ADC(void);
 #define TRIG_SEL_ePWM11_SOCB    0x1A
 #define TRIG_SEL_ePWM12_SOCA    0x1B
 #define TRIG_SEL_ePWM12_SOCB    0x1C
+#define TRIG_SEL_CPU2_TIM0  0x1D
+#define TRIG_SEL_CPU2_TIM1  0x1E
+#define TRIG_SEL_CPU2_TIM2  0x1F
 
 #endif /* PERIPHERAL_SETUP_H_ */

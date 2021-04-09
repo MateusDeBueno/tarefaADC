@@ -52,7 +52,9 @@ void SOGI_coeff_update(float delta_T, float wn, float k, SPLL_SOGI *spll){
     spll->osg_coeff.osg_x = osgx;
     osgy = wn*delta_T*wn*delta_T;
     spll->osg_coeff.osg_y = osgy;
-    temp = 1.0/(osgx+osgy+4.0);
+    //temp = 1.0/(osgx+osgy+4.0);
+    temp = __divf32(1.0,(osgx+osgy+4.0));
+
     spll->osg_coeff.osg_b0 = osgx*temp;
     spll->osg_coeff.osg_b2 = (-1.0)*spll->osg_coeff.osg_b0;
     spll->osg_coeff.osg_a1 = (2.0*(4.0-osgy))*temp;
@@ -91,10 +93,10 @@ void SPLL_SOGI_CALC(SPLL_SOGI *spll_obj){
 
     spll_obj->theta[1] = spll_obj->theta[0];
     spll_obj->sin_ = __sin(spll_obj->theta[0]);
-    spll_obj->cos_ = __cos(spll_obj->theta[0]);
+    //spll_obj->cos_ = __cos(spll_obj->theta[0]);
 
     //spll_obj->sin_ = sin(spll_obj->theta[0]);
-    //spll_obj->cos_ = cos(spll_obj->theta[0]);
+    spll_obj->cos_ = cos(spll_obj->theta[0]);
 
 }
 

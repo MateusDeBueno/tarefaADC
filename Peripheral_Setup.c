@@ -67,6 +67,13 @@ void Setup_GPIO(void){
     GpioCtrlRegs.GPADIR.bit.GPIO14 = 1;
     GpioCtrlRegs.GPAPUD.bit.GPIO14 = 1;
 
+    //GPIO15
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO15 = 0;
+    GpioCtrlRegs.GPAMUX1.bit.GPIO15 = 0;
+    GpioCtrlRegs.GPADIR.bit.GPIO15 = 1;
+    GpioCtrlRegs.GPAPUD.bit.GPIO15 = 1;
+    GpioCtrlRegs.GPACSEL2.bit.GPIO15 = GPIO_MUX_CPU1CLA;
+
     EDIS;
 }
 
@@ -114,7 +121,7 @@ void Setup_ePWM(void){
 
 
     /////////////CONFIGURA PWM7/////////////
-    EPwm7Regs.TBPRD = 3250;                             //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
+    EPwm7Regs.TBPRD = 3255;                             //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
     EPwm7Regs.CMPA.bit.CMPA = 0;
     EPwm7Regs.TBPHS.bit.TBPHS = 0;                      //defasagem 0
     EPwm7Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;          //recebe pulso de sincronismo
@@ -137,7 +144,7 @@ void Setup_ePWM(void){
 
 
     /////////////CONFIGURA PWM8/////////////
-    EPwm8Regs.TBPRD = 5000;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
+    EPwm8Regs.TBPRD = 3255;                             //25kz //PRD=MCclock/(2*fs), porem se updown PRD = MCclock/(4*fs)
     EPwm8Regs.CMPA.bit.CMPA = 0;
     EPwm8Regs.TBPHS.bit.TBPHS = 0;                      //defasagem 0
     EPwm8Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;          //recebe pulso de sincronismo

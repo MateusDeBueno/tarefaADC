@@ -1,18 +1,33 @@
 #include "peripheral_setup.h"
 #include "sogi.h"
+#include "CLA1_Config.h"
 
 /**
  * main.c
  */
 
 
-uint32_t count=0, index=0, index400=0;
-uint16_t sinetable[125];
-uint16_t sinetable400[400];
+uint32_t count=0, index=0, index400=0, count_task;
+// uint16_t sinetable[125];
+// uint16_t sinetable400[400];
 
+/*
 float min = 0;
 float max = 0;
-uint16_t del;
+*/
+
+
+volatile SPLL_SOGI cla1_pll; //cria struct pro PLL usado no CLA
+volatile float vrede_CLA = 0;
+volatile float phase_CLA = 0;
+volatile float ampl_CLA = 0.5;
+//passar variaveis para o segmento de memoria que o CLA tem acesso
+#pragma DATA_SECTION(vrede_CLA, "Cla1ToCpuMsgRAM"); //esse segmento a CPU consegue observar
+#pragma DATA_SECTION(cla1_pll, "CLADataLS0");
+#pragma DATA_SECTION(phase_CLA, "CLADataLS0"); //LS0 foi alocado para dados do CLA
+#pragma DATA_SECTION(ampl_CLA, "CLADataLS0");
+// #pragma CODE_SECTION(adc_isr,"CLADataLS5"); //codigo nao precisa pq ja vai automatico pra memoria certa
+
 
 SPLL_SOGI v_pll; //cria struct pro PLL
 float vrede = 0;
@@ -24,14 +39,6 @@ float plot1[512], plot2[512];
 float *padc1 = &vrede;
 float *padc2 = &vsync;
 
-uint16_t adc1 = 0;
-uint16_t adc2 = 0;
-
-uint16_t plot[400];
-uint16_t *adc = &adc1;
-
-uint16_t deleta;
-uint16_t z = 1000;
 uint16_t valor;
 
 __interrupt void isr_cpu_timer0(void);
@@ -50,6 +57,8 @@ int main(void)
     Setup_ePWM();
     Setup_ADC();
     Setup_DAC();
+    CLA1_ConfigCLAMemory();
+    CLA1_InitCpu1Cla1();
 
     EALLOW;
     PieVectTable.TIMER0_INT = &isr_cpu_timer0;  //atribui endereco para funcao interrupt timer0
@@ -73,9 +82,13 @@ int main(void)
     }
     index = 0;
     */
-
+    //inicializa PLL da interrupcao do ADC A3
     SOGI_init(60, 32.5520833E-06, &v_pll); //inicializa PLL //(float Grid_freq, float DELTA_T, SPLL_SOGI *spll_obj)
     SOGI_coeff_update(32.5520833E-06, 376.99112, 0.7, &v_pll); //(float delta_T, float wn, float k, SPLL_SOGI *spll)
+
+    //inicializa PLL do CLA 1
+    SOGI_init(60, 32.5520833E-06, &cla1_pll); //inicializa PLL //(float Grid_freq, float DELTA_T, SPLL_SOGI *spll_obj)
+    SOGI_coeff_update(32.5520833E-06, 376.99112, 0.7, &cla1_pll); //(float delta_T, float wn, float k, SPLL_SOGI *spll)
 
 
     EINT;                           //Enable Global interrupt INTM
@@ -106,11 +119,13 @@ __interrupt void isr_adc(void){
     //vrede = 0.0005*((int)AdcaResultRegs.ADCRESULT0 - 0x7FF); //-2047
     vrede = 0.000732869*((int)AdcaResultRegs.ADCRESULT0 - 1364.0);
 
+    /*
     if (min > vrede)
         min = vrede;
 
     if (max < vrede)
         max = vrede;
+    */
 
     //adc1 = AdcaResultRegs.ADCRESULT0;
     //adc2 = AdcaResultRegs.ADCRESULT1;
@@ -121,10 +136,9 @@ __interrupt void isr_adc(void){
     SPLL_SOGI_CALC(&v_pll);
 
     vsync = v_pll.sin_;
-    del = (uint16_t) (1627.0 * (1.0 + ampl * __sin(v_pll.theta[1]+phase)));
-    //del = (uint16_t) (1627.0 * (1.0 + ampl * sin(v_pll.theta[1]+phase)));
-    EPwm7Regs.CMPA.bit.CMPA = del;
+    EPwm7Regs.CMPA.bit.CMPA = (uint16_t) (1627.0 * (1.0 + ampl * __sin(v_pll.theta[1]+phase)));
     //EPwm7Regs.CMPA.bit.CMPA = (uint16_t) (1627.0 * (1.0 + ampl * sin(v_pll.theta[1]+phase)));
+    GpioDataRegs.GPADAT.bit.GPIO14 = 0;
 
     //EPwm7Regs.CMPA.bit.CMPA = sinetable[index400];
     //EPwm8Regs.CMPA.bit.CMPA = sinetable[index400];
@@ -138,12 +152,46 @@ __interrupt void isr_adc(void){
     if (valor < 4095){
         EALLOW;
         DacaRegs.DACVALS.bit.DACVALS = (uint16_t) valor;
-        //DacaRegs.DACVALS.bit.DACVALS = (uint16_t) (2047.0 * (1.0 + ampl * sin( v_pll.theta[1] + phase)));
         EDIS;
     }
-    deleta++;
     AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;  //clear INT1 flag
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+}
 
-    GpioDataRegs.GPADAT.bit.GPIO14 = 0;
+// Definicoes em CLA_Config.h
+__interrupt void CLA1_isr1(void){
+    count_task++;
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
+}
+
+__interrupt void CLA1_isr2(void){
+    asm(" ESTOP0");
+}
+
+__interrupt void CLA1_isr3(void){
+    asm(" ESTOP0");
+}
+
+__interrupt void CLA1_isr4(void){
+    asm(" ESTOP0");
+}
+
+__interrupt void CLA1_isr5(void){
+    asm(" ESTOP0");
+}
+
+__interrupt void CLA1_isr6(void){
+    asm(" ESTOP0");
+}
+
+__interrupt void CLA1_isr7(void){
+    //asm(" ESTOP0");
+    asm(" ESTOP0");
+}
+
+__interrupt void CLA1_isr8(void){
+    // Acknowledge the end-of-task interrupt for task 8
+    PieCtrlRegs.PIEACK.all = M_INT11;
+    // Uncomment to halt debugger and stop here
+    //    asm(" ESTOP0");
 }

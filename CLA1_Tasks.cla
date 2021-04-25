@@ -32,7 +32,7 @@ __interrupt void CLA1Task1(void){ //nao aceita chamar funcoes
     cla1_pll.sin_ = CLAsin(cla1_pll.theta[0]);
     cla1_pll.cos_ = CLAcos(cla1_pll.theta[0]);
     //
-    EPwm8Regs.CMPA.bit.CMPA = (uint16_t) (1627.0 * (1.0 + ampl_CLA * CLAsin(cla1_pll.theta[0] + phase_CLA)));
+    //EPwm8Regs.CMPA.bit.CMPA = (uint16_t) (1627.0 * (1.0 + ampl_CLA * CLAsin(cla1_pll.theta[0] + phase_CLA)));
 
     GpioDataRegs.GPADAT.bit.GPIO15 = 0;
 

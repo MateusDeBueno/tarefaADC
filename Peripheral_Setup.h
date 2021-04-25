@@ -13,8 +13,10 @@
 
 void Setup_GPIO(void);
 void Setup_ePWM(void);
-void Setup_ADC(void);
-void Setup_DAC(void);
+void Setup_ADC_A(void);
+void Setup_ADC_B(void);
+void Setup_DAC_A(void);
+void Setup_DAC_B(void);
 
 //criar define manual para selecionar trigger do ADC
 #define TRIG_SEL_SOFT   0x00
